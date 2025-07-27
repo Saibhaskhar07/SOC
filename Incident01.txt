@@ -1,0 +1,67 @@
+Incident Title : SOC335 - CVE-2024-49138 Exploitation Detected 
+
+Details : 
+-----------------------------------------------------------------
+| Field                | Value                                  |
+| -------------------- | -------------------------------------- |
+| Date/Time            | 22-01-2025 at 02:37 AM                 |
+| Analyst              | Saibhaskhar Ramesh                     |
+| Incident ID          | SOC‑IR‑2025‑0122‑313                   |
+| Host                 | Victor (IP 172.16.17.207)              |
+| Type                 | Privilege Escalation (CVE‑2024‑49138)  |
+| Detection Source     | Detection Rule SOC335 in SIEM          |
+| Severity             | Medium                                 |
+| Status               | Closed (Confirmed & Remediated)        |
+-----------------------------------------------------------------
+
+Description : 
+On January 22, 2025 at 02:37 AM , SOC detection rule SOC335 flagged execution of svohost.exe from an unusual path
+(C:\temp\service_installer), indicating potential exploitation of CVE‑2024‑49138, a Windows CLFS privilege‑escalation 
+vulnerability.
+Shortly thereafter, a successful Remote Desktop login from IP 185.107.56.141 confirmed attacker access to the host. 
+The alert accurately prevented a full system compromise. Immediate containment and patching followed.
+
+
+Investigation Details : 
+a. Detection
+Alert triggered by SOC335 – CVE‑2024‑49138 Exploitation Detected, capturing execution of svohost.exe with 
+suspicious hash behavior 
+Executable path: C:\temp\service_installer\svohost.exe.
+Parent process: PowerShell.exe, launched via a download command — typical of a fileless attack
+
+b. Timeline Reconstruction
+14:32–14:35 : Multiple failed login attempts from 185.107.56.141, followed by a successful login as Victor 
+PowerShell executed payload that disabled script execution policy and downloaded svohost.exe wrapped in 
+ServiceInstaller.zip  
+
+c. Hash & Behavior Analysis
+File hash: b432dcf4a0f0b601b1d79848467137a5e25cab5a0b7b1224be9d3b6540122db9 identified as malicious by endpoint sensors 
+Behavior: payload spawned conhost.exe with abnormal parameters, consistent with exploitation techniques 
+
+
+d. Confirmation of Compromise
+Newly established RDP session from known malicious IP confirmed active compromise.
+
+
+Tools Used :
+1. Let's Defend SIEM and Endpoint Detection
+2. PowerShell Logs
+3. VirusTotal
+4. IOC hashing and reputation lookup
+5. MITRE ATT&CK mapping
+
+Actions Taken : 
+1. Isolated host Victor from the network immediately.
+2. Blocked 185.107.56.141 at firewall and RDP access.
+3. Removed malicious executable and any temporary files.
+
+
+Conclusion : 
+To conclude, a C2 server connection and the running of svohost.exe indicates that the system is compromised. 
+PowerShell was used to download and run malicious payload, hence the affected machine was immediately contained 
+to avoid any further damage.
+After getting a detailed examination of the Endpoint Security logs of the Victor system, it appeared that the
+malicious process, svohost.exe, was still in operating stage with PID 7640. This shows that the attacker has 
+already managed to compromise the system and start the process with the name svohost.exe as a part of persistence,
+and it keeps acting under the name of legitimate service. That there is this process implies that the attacker is 
+performing additional malicious operations that could be done with escalated privileges.
